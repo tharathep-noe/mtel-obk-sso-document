@@ -1,0 +1,38 @@
+---
+title: "Health Check"
+description: "Liveness / readiness probe. Returns the deployed application version."
+api: "GET /health"
+---
+
+<Info>
+  No authentication. This endpoint has no guard applied.
+</Info>
+
+## Body
+
+This endpoint takes no request body.
+
+## Response
+
+<ResponseField name="appVersion" type="string">
+  Deployed application version. Taken from package.json of the running build.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url 'https://{{SSO_BASE_URL}}/health'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "appVersion": "2.5.1"
+}
+```
+
+</ResponseExample>

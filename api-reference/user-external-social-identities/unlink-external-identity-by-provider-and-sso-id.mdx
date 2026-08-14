@@ -1,0 +1,67 @@
+---
+title: "Unlink External Identity by Provider and SSO ID"
+description: "Server-to-server equivalent of POST /user/me/external-identity/delete."
+api: "POST /user/{ssoId}/external-identity/delete"
+---
+
+<Info>
+  Client credentials. Send `clientId` and `clientSecret` as headers.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+<ParamField header="clientId" type="string" required>
+  Client ID issued by the SSO team.
+</ParamField>
+
+<ParamField header="clientSecret" type="string" required>
+  Client secret issued by the SSO team.
+</ParamField>
+
+## Path parameters
+
+<ParamField path="ssoId" type="string" required>
+  publicId of the account. sso_xxxx.
+</ParamField>
+
+## Body
+
+See the request example.
+
+## Response
+
+<ResponseField name="result" type="boolean">
+  Whether the operation succeeded.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable confirmation. For display or logging only. Do not branch on this text.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://{{SSO_BASE_URL}}/user/{ssoId}/external-identity/delete' \
+  --header 'Content-Type: application/json' \
+  --header 'clientId: {client_id}' \
+  --header 'clientSecret: {client_secret}' \
+  --data '{
+  "value": "fb-uid-123",
+  "provider": "facebook"
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```text 200
+(same as POST /user/me/external-identity/delete)
+```
+
+</ResponseExample>

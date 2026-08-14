@@ -1,0 +1,190 @@
+---
+title: "Add Identity (own account)"
+description: "Add an email or phone identity to the token owner, or merge a matching Buzzebee account."
+api: "POST /user/me/identity"
+---
+
+<Info>
+  Bearer token. Send `Authorization: Bearer {access_token}`.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Access token from `POST /oauth/token`, in the form `Bearer {access_token}`.
+</ParamField>
+
+## Body
+
+<ParamField body="identifier" type="string" required>
+  Email address or phone number. Lower-cased server-side.
+</ParamField>
+
+<ParamField body="provider" type="string" required>
+  Identity channel. email | phone (the enum also accepts sso | keycloak).
+</ParamField>
+
+<ParamField body="mode" type="string">
+  create adds a new identity; merge merges the matching Buzzebee account. create (default) | merge.
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">
+  Internal account id. Not the publicId.
+</ResponseField>
+
+<ResponseField name="publicId" type="string">
+  SSO ID of the account. Format sso_xxxx.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Account creation time. ISO-8601 UTC.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+  Last update time. ISO-8601 UTC.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Account status. active | inactive | blocked | suspended.
+</ResponseField>
+
+<ResponseField name="registrationType" type="string">
+  Registration category. Nullable.
+</ResponseField>
+
+<ResponseField name="suspendedAt" type="string">
+  Time the account was suspended. Nullable. Null means active.
+</ResponseField>
+
+<ResponseField name="identites[]" type="object[]">
+  Email and phone identities. Optional. Note the spelling in the payload.
+</ResponseField>
+
+<ResponseField name="identites[].id" type="string">
+  Identity record id.
+</ResponseField>
+
+<ResponseField name="identites[].provider" type="string">
+  Identity channel. email | phone | sso | keycloak.
+</ResponseField>
+
+<ResponseField name="identites[].identifier" type="string">
+  Email address or phone number.
+</ResponseField>
+
+<ResponseField name="identites[].default" type="boolean">
+  Marks the default identity. The default identity cannot be deleted.
+</ResponseField>
+
+<ResponseField name="identites[].meta" type="object">
+  Identity metadata. Nullable.
+</ResponseField>
+
+<ResponseField name="identites[].createdAt" type="string">
+  Creation time.
+</ResponseField>
+
+<ResponseField name="identites[].updatedAt" type="string">
+  Last update time.
+</ResponseField>
+
+<ResponseField name="identites[].accountId" type="string">
+  Owning account id. Optional.
+</ResponseField>
+
+<ResponseField name="externalIdentities[]" type="object[]">
+  Linked social identities. Optional.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].id" type="string">
+  External identity record id.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].uid" type="string">
+  User id at the provider.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].provider" type="string">
+  Social provider. facebook | google | line | apple | email | phone | iam | bzb.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].meta" type="object">
+  Provider metadata. Nullable.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].createdAt" type="string">
+  Creation time.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].updatedAt" type="string">
+  Last update time.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].accountId" type="string">
+  Owning account id. Optional.
+</ResponseField>
+
+<ResponseField name="migrationCampaignRedeem.campaignCode" type="string">
+  Campaign code applied while merging a Buzzebee account. Optional. Populated for mode = merge.
+</ResponseField>
+
+<ResponseField name="migrationCampaignRedeem.isRedeemed" type="boolean">
+  Whether the migration campaign was redeemed. Optional.
+</ResponseField>
+
+## Remarks
+
+- The response key is spelled "identites" — this is the contract as implemented.
+- Duplicate identity returns SSO_IDP_001; exceeding 3 emails or 3 phone numbers returns SSO_IDP_002.
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://{{SSO_BASE_URL}}/user/me/identity' \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer {access_token}' \
+  --data '{
+  "identifier": "user2@example.com",
+  "provider": "email",
+  "mode": "create"
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "id": "b1f0c8e2-1234-4c9a-9f3e-0a1b2c3d4e5f",
+  "publicId": "sso_01HZX9K3M4N5P6Q7R8S9T0",
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "updatedAt": "2026-01-01T00:00:00.000Z",
+  "status": "active",
+  "registrationType": "thai",
+  "suspendedAt": null,
+  "identites": [
+    {
+      "id": "9c1e...",
+      "provider": "email",
+      "identifier": "user@example.com",
+      "default": true,
+      "meta": null,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "accountId": "b1f0c8e2-1234-4c9a-9f3e-0a1b2c3d4e5f"
+    }
+  ],
+  "externalIdentities": [],
+  "migrationCampaignRedeem": {}
+}
+```
+
+</ResponseExample>

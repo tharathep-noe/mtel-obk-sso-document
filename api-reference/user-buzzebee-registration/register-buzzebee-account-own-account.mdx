@@ -1,0 +1,67 @@
+---
+title: "Register Buzzebee Account (own account)"
+description: "Register the token owner in Buzzebee. No request body."
+api: "POST /user/bzb/register"
+---
+
+<Info>
+  Bearer token. Send `Authorization: Bearer {access_token}`.
+</Info>
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Access token from `POST /oauth/token`, in the form `Bearer {access_token}`.
+</ParamField>
+
+## Body
+
+This endpoint takes no request body.
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether Buzzebee accepted the registration.
+</ResponseField>
+
+<ResponseField name="code" type="string">
+  Status code returned by Buzzebee. Optional. Passed through unchanged.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Message returned by Buzzebee. Optional. Passed through unchanged.
+</ResponseField>
+
+<ResponseField name="data.UserId" type="string">
+  Buzzebee user id of the newly created account. Store it if you need to cross-reference Buzzebee.
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  Email address used for the Buzzebee registration. Optional.
+</ResponseField>
+
+<ResponseField name="phone_number" type="string">
+  Phone number used for the Buzzebee registration. Optional.
+</ResponseField>
+
+## Remarks
+
+- Failures return SSO_BZB_002 with the message replaced at runtime by "`<bzbCode>`:`<bzbMessage>`" from Buzzebee — match on the error code, not the message.
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://{{SSO_BASE_URL}}/user/bzb/register' \
+  --header 'Authorization: Bearer {access_token}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```text 200
+(Buzzebee registration result)
+```
+
+</ResponseExample>

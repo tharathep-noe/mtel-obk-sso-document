@@ -1,0 +1,261 @@
+---
+title: "Register User"
+description: "Create a new SSO account and return a logged-in session for it."
+api: "POST /user/register"
+---
+
+<Info>
+  Client credentials. Send `clientId` and `clientSecret` as headers.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+<ParamField header="clientId" type="string" required>
+  Client ID issued by the SSO team.
+</ParamField>
+
+<ParamField header="clientSecret" type="string" required>
+  Client secret issued by the SSO team.
+</ParamField>
+
+## Body
+
+<ParamField body="firstName" type="string" required>
+  Given name.
+</ParamField>
+
+<ParamField body="middleName" type="string">
+  Middle name.
+</ParamField>
+
+<ParamField body="lastName" type="string" required>
+  Family name.
+</ParamField>
+
+<ParamField body="birthDate" type="string">
+  Date of birth. YYYY-MM-DD.
+</ParamField>
+
+<ParamField body="profilePhoto" type="string" required>
+  Profile image URL. Send "" when not available.
+</ParamField>
+
+<ParamField body="gender" type="string" required>
+  Gender of the user. male | female | nonbinary | prefernottosay.
+</ParamField>
+
+<ParamField body="password" type="string">
+  Initial password. Min 8 characters.
+</ParamField>
+
+<ParamField body="idCard" type="string">
+  Thai national ID number. PII — confirm handling.
+</ParamField>
+
+<ParamField body="passport" type="string">
+  Passport number. PII — confirm handling.
+</ParamField>
+
+<ParamField body="emails" type="object[]" required>
+  Email identities. Max 3 items; send [] when empty.
+</ParamField>
+
+<ParamField body="emails[].value" type="string" required>
+  Email address. Valid email format.
+</ParamField>
+
+<ParamField body="emails[].isDefault" type="boolean">
+  Marks the primary email. Default true.
+</ParamField>
+
+<ParamField body="phoneNumbers" type="object[]" required>
+  Phone identities. Max 3 items; send [] when empty.
+</ParamField>
+
+<ParamField body="phoneNumbers[].value" type="string" required>
+  Phone number including country code.
+</ParamField>
+
+<ParamField body="phoneNumbers[].isDefault" type="boolean">
+  Marks the primary phone number. Default true.
+</ParamField>
+
+<ParamField body="external" type="object[]" required>
+  Linked social identities. Send [] when empty.
+</ParamField>
+
+<ParamField body="external[].value" type="string" required>
+  User id (uid) at the provider.
+</ParamField>
+
+<ParamField body="external[].provider" type="string" required>
+  Social provider. facebook | google | line | apple | email | phone | iam | bzb.
+</ParamField>
+
+<ParamField body="external[].meta" type="object">
+  Free-form provider metadata.
+</ParamField>
+
+<ParamField body="addresses" type="object[]">
+  Postal addresses.
+</ParamField>
+
+<ParamField body="addresses[].type" type="string">
+  Address type. home | office | other.
+</ParamField>
+
+<ParamField body="meta" type="object">
+  Free-form metadata stored with the profile.
+</ParamField>
+
+<ParamField body="registrationType" type="string">
+  Registration category. thai | non_thai | traveler (legacy "traveller" is accepted and normalised to "traveler").
+</ParamField>
+
+## Response
+
+<ResponseField name="data.accessToken" type="string">
+  JWT for the newly registered user. The user is registered and logged in by the same call.
+</ResponseField>
+
+<ResponseField name="data.tokenType" type="string">
+  Token type. Always "Bearer".
+</ResponseField>
+
+<ResponseField name="data.expiresIn" type="number">
+  Access token lifetime in seconds. Currently returned as the literal 3600.
+</ResponseField>
+
+<ResponseField name="data.refreshToken" type="string">
+  Token used to obtain a new access token.
+</ResponseField>
+
+<ResponseField name="data.publicId" type="string">
+  SSO ID of the new account. Format sso_xxxx. Store it, there is no lookup by email later.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+  Account status. active | inactive | blocked | suspended.
+</ResponseField>
+
+<ResponseField name="data.scope" type="string">
+  Reserved for future use. Optional.
+</ResponseField>
+
+<ResponseField name="data.profile" type="object">
+  Profile of the new account. Subset of the profile object.
+</ResponseField>
+
+<ResponseField name="data.profile.firstName" type="string">
+  Given name.
+</ResponseField>
+
+<ResponseField name="data.profile.middleName" type="string">
+  Middle name. Optional.
+</ResponseField>
+
+<ResponseField name="data.profile.lastName" type="string">
+  Family name.
+</ResponseField>
+
+<ResponseField name="data.profile.gender" type="string">
+  Gender.
+</ResponseField>
+
+<ResponseField name="data.profile.emails[]" type="object[]">
+  Email identities.
+</ResponseField>
+
+<ResponseField name="data.profile.phoneNumbers[]" type="object[]">
+  Phone identities.
+</ResponseField>
+
+<ResponseField name="data.profile.external[]" type="object[]">
+  Linked social identities.
+</ResponseField>
+
+<ResponseField name="data.profile.addresses[]" type="object[]">
+  Postal addresses. Optional.
+</ResponseField>
+
+<ResponseField name="data.profile.meta" type="object">
+  Free-form metadata. Optional.
+</ResponseField>
+
+## Remarks
+
+- The account is registered and logged in by the same call — no separate /oauth/token request is needed.
+- The Buzzebee client is not permitted to call this endpoint and receives SSO_BZB_001.
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://{{SSO_BASE_URL}}/user/register' \
+  --header 'Content-Type: application/json' \
+  --header 'clientId: {client_id}' \
+  --header 'clientSecret: {client_secret}' \
+  --data '{
+  "firstName": "Somchai",
+  "middleName": "",
+  "lastName": "Jaidee",
+  "birthDate": "1990-01-31",
+  "profilePhoto": "",
+  "gender": "male",
+  "password": "secret123",
+  "idCard": "1234567890123",
+  "emails": [
+    { "value": "user@example.com", "isDefault": true }
+  ],
+  "phoneNumbers": [
+    { "value": "66812345678", "isDefault": true }
+  ],
+  "external": [],
+  "addresses": [
+    {
+      "address": "1 Wireless Road",
+      "zipCode": "10330",
+      "province": "Bangkok",
+      "district": "Pathum Wan",
+      "subDistrict": "Lumphini",
+      "country": "TH",
+      "type": "home"
+    }
+  ],
+  "meta": {},
+  "registrationType": "thai"
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "tokenType": "Bearer",
+    "expiresIn": 3600,
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "publicId": "sso_01HZX9K3M4N5P6Q7R8S9T0",
+    "status": "active",
+    "scope": "",
+    "profile": {
+      "firstName": "Somchai",
+      "lastName": "Jaidee",
+      "emails": [ { "value": "user@example.com", "isDefault": true } ],
+      "phoneNumbers": [ { "value": "66812345678", "isDefault": true } ],
+      "external": [],
+      "gender": "male",
+      "meta": {}
+    }
+  }
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,61 @@
+---
+title: "Update Own OAuth Client"
+description: "Update the redirectUri registered for your own client."
+api: "PATCH /oauth/client/edit"
+---
+
+<Info>
+  Client credentials. Send `clientId` and `clientSecret` as headers.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+<ParamField header="clientId" type="string" required>
+  Client ID issued by the SSO team.
+</ParamField>
+
+<ParamField header="clientSecret" type="string" required>
+  Client secret issued by the SSO team.
+</ParamField>
+
+## Body
+
+<ParamField body="redirectUri" type="string" required>
+  Callback URL of the calling application.
+</ParamField>
+
+## Response
+
+This endpoint returns no response body. Check the HTTP status code instead.
+
+## Remarks
+
+- Swagger advertises HTTP 204 for this endpoint but no @HttpCode is applied, so the service returns HTTP 200 with an empty body.
+- clientSecret rotation is not self-service. Contact the SSO team.
+
+<RequestExample>
+
+```bash cURL
+curl --request PATCH \
+  --url 'https://{{SSO_BASE_URL}}/oauth/client/edit' \
+  --header 'Content-Type: application/json' \
+  --header 'clientId: {client_id}' \
+  --header 'clientSecret: {client_secret}' \
+  --data '{
+  "redirectUri": "https://your-app.example.com/callback"
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```text 200
+(empty body)
+```
+
+</ResponseExample>

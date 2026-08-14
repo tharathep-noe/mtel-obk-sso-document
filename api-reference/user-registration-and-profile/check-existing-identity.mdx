@@ -1,0 +1,86 @@
+---
+title: "Check Existing Identity"
+description: "Check whether an email, phone number or social uid already exists in SSO, IAM or Buzzebee."
+api: "POST /user/exists"
+---
+
+<Info>
+  Client credentials. Send `clientId` and `clientSecret` as headers.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+<ParamField header="clientId" type="string" required>
+  Client ID issued by the SSO team.
+</ParamField>
+
+<ParamField header="clientSecret" type="string" required>
+  Client secret issued by the SSO team.
+</ParamField>
+
+## Body
+
+<ParamField body="email" type="string">
+  Email address to look up. Send exactly one of email / phoneNumber / uid. Conditional field.
+</ParamField>
+
+<ParamField body="phoneNumber" type="string">
+  Phone number to look up. Send exactly one of email / phoneNumber / uid. Conditional field.
+</ParamField>
+
+<ParamField body="uid" type="string">
+  Social provider user id to look up. Send exactly one of email / phoneNumber / uid. Conditional field.
+</ParamField>
+
+<ParamField body="scope" type="object[]">
+  Systems to search. Default ["sso","iam","bzb"].
+</ParamField>
+
+<ParamField body="filter" type="string">
+  Restrict Buzzebee results to unmerged accounts. bzb-unmerged (applied automatically when searching by uid).
+</ParamField>
+
+## Response
+
+<ResponseField name="isFound" type="boolean">
+  Whether the identity exists in any of the requested systems. Searches SSO, IAM and Buzzebee according to scope.
+</ResponseField>
+
+<ResponseField name="isSuspended" type="boolean">
+  Whether the matching SSO account is suspended. Only an SSO match can set this to true.
+</ResponseField>
+
+## Remarks
+
+- Sending zero, or more than one, of email / phoneNumber / uid fails validation with HTTP 400.
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://{{SSO_BASE_URL}}/user/exists' \
+  --header 'Content-Type: application/json' \
+  --header 'clientId: {client_id}' \
+  --header 'clientSecret: {client_secret}' \
+  --data '{
+  "email": "user@example.com",
+  "scope": ["sso", "iam", "bzb"]
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "isFound": true,
+  "isSuspended": false
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,256 @@
+---
+title: "Update User Profile by SSO ID"
+description: "Update selected profile fields of an account. Send only the fields that change."
+api: "PATCH /user/update/{ssoId}"
+---
+
+<Info>
+  Client credentials. Send `clientId` and `clientSecret` as headers.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+<ParamField header="clientId" type="string" required>
+  Client ID issued by the SSO team.
+</ParamField>
+
+<ParamField header="clientSecret" type="string" required>
+  Client secret issued by the SSO team.
+</ParamField>
+
+## Path parameters
+
+<ParamField path="ssoId" type="string" required>
+  publicId of the account. sso_xxxx.
+</ParamField>
+
+## Body
+
+<ParamField body="firstName / middleName / lastName" type="string">
+  Name fields.
+</ParamField>
+
+<ParamField body="publicId" type="string">
+  Optional echo of the path parameter. Must equal `{ssoId}`, otherwise OB_0010.
+</ParamField>
+
+<ParamField body="birthDate" type="string">
+  Date of birth. YYYY-MM-DD.
+</ParamField>
+
+<ParamField body="profilePhoto" type="string">
+  Profile image URL.
+</ParamField>
+
+<ParamField body="gender" type="string">
+  Gender. male | female | nonbinary | prefernottosay.
+</ParamField>
+
+<ParamField body="status" type="string">
+  Account status. active | inactive | blocked | suspended.
+</ParamField>
+
+<ParamField body="idCard / passport" type="string">
+  Identification numbers. PII.
+</ParamField>
+
+<ParamField body="meta" type="object">
+  Free-form metadata.
+</ParamField>
+
+<ParamField body="addresses" type="object[]">
+  Postal addresses (full replacement). Include id to update an existing row.
+</ParamField>
+
+<ParamField body="registrationType" type="string">
+  Registration category. thai | non_thai | traveler.
+</ParamField>
+
+## Response
+
+<ResponseField name="firstName" type="string">
+  Given name.
+</ResponseField>
+
+<ResponseField name="middleName" type="string">
+  Middle name. Nullable.
+</ResponseField>
+
+<ResponseField name="lastName" type="string">
+  Family name.
+</ResponseField>
+
+<ResponseField name="birthDate" type="string">
+  Date of birth. Nullable. ISO-8601 UTC.
+</ResponseField>
+
+<ResponseField name="profilePhoto" type="string">
+  Profile image URL. Nullable.
+</ResponseField>
+
+<ResponseField name="gender" type="string">
+  Gender. Nullable. male | female | nonbinary | prefernottosay.
+</ResponseField>
+
+<ResponseField name="idCard" type="string">
+  Thai national ID number. Nullable. PII.
+</ResponseField>
+
+<ResponseField name="passport" type="string">
+  Passport number. Nullable. PII.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Account status. active | inactive | blocked | suspended.
+</ResponseField>
+
+<ResponseField name="publicId" type="string">
+  SSO ID of the account. Format sso_xxxx.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Account creation time. ISO-8601 UTC.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+  Last profile update time. ISO-8601 UTC.
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Free-form metadata stored with the profile. Returned unchanged.
+</ResponseField>
+
+<ResponseField name="addresses[]" type="object[]">
+  Postal addresses. Empty array when none.
+</ResponseField>
+
+<ResponseField name="addresses[].id" type="string">
+  Address record id. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].address" type="string">
+  Street address. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].zipCode" type="string">
+  Postal code. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].province" type="string">
+  Province. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].district" type="string">
+  District. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].subDistrict" type="string">
+  Sub-district. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].country" type="string">
+  Country. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].type" type="string">
+  Address type. Nullable. home | office | other.
+</ResponseField>
+
+<ResponseField name="emails[]" type="object[]">
+  Email identities. Maximum 3 items.
+</ResponseField>
+
+<ResponseField name="emails[].id" type="string">
+  Identity record id. Use for /user/me/identity/`{identityId}` operations.
+</ResponseField>
+
+<ResponseField name="emails[].value" type="string">
+  Email address.
+</ResponseField>
+
+<ResponseField name="emails[].isDefault" type="boolean">
+  Marks the primary email.
+</ResponseField>
+
+<ResponseField name="phoneNumbers[]" type="object[]">
+  Phone identities. Maximum 3 items.
+</ResponseField>
+
+<ResponseField name="phoneNumbers[].id" type="string">
+  Identity record id.
+</ResponseField>
+
+<ResponseField name="phoneNumbers[].value" type="string">
+  Phone number including country code.
+</ResponseField>
+
+<ResponseField name="phoneNumbers[].isDefault" type="boolean">
+  Marks the primary phone number.
+</ResponseField>
+
+<ResponseField name="external[]" type="object[]">
+  Linked social identities. Empty array when none.
+</ResponseField>
+
+<ResponseField name="external[].id" type="string">
+  External identity record id.
+</ResponseField>
+
+<ResponseField name="external[].value" type="string">
+  User id (uid) at the provider.
+</ResponseField>
+
+<ResponseField name="external[].provider" type="string">
+  Social provider. facebook | google | line | apple | email | phone | iam | bzb.
+</ResponseField>
+
+<ResponseField name="external[].meta" type="object">
+  Provider metadata. Optional.
+</ResponseField>
+
+<ResponseField name="registrationType" type="string">
+  Registration category. Nullable. thai | non_thai | traveler.
+</ResponseField>
+
+<ResponseField name="hasPassword" type="boolean">
+  Whether the account can log in with grantType = password. Use it to decide between a password field and a social provider.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request PATCH \
+  --url 'https://{{SSO_BASE_URL}}/user/update/{ssoId}' \
+  --header 'Content-Type: application/json' \
+  --header 'clientId: {client_id}' \
+  --header 'clientSecret: {client_secret}' \
+  --data '{
+  "firstName": "Somchai",
+  "lastName": "Jaidee",
+  "gender": "male",
+  "addresses": [
+    {
+      "id": "0f3a...",
+      "address": "1 Wireless Road",
+      "zipCode": "10330",
+      "province": "Bangkok",
+      "country": "TH",
+      "type": "home"
+    }
+  ]
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```text 200
+(the full profile object, same shape as GET /user/profile/{ssoId})
+```
+
+</ResponseExample>
