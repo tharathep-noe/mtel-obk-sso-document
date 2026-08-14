@@ -1,0 +1,35 @@
+---
+title: "Introduction"
+---
+
+The **obk-sso** service issues and validates identity for OneBangkok applications. This reference covers every endpoint a consuming team can call.
+
+<Note>
+  Replace `{{SSO_BASE_URL}}` throughout this documentation with the host for your target environment. Base URLs are issued per environment by the SSO team.
+</Note>
+
+## Onboarding requirements
+
+<Steps>
+  <Step title="Request a client">
+    Ask the SSO team to register a client for you. Provide a unique `clientName` and a `redirectUri`. Self-registration is locked behind the master `API_KEY` held by the SSO team.
+  </Step>
+  <Step title="Store the credentials">
+    You receive a `clientId` and a `clientSecret`. Store both in a secret manager. `clientSecret` must never be shipped inside a mobile binary or browser bundle.
+  </Step>
+  <Step title="Align social app credentials">
+    Only for `grantType = social`. See [Social login app credentials](/social-login-app-credentials).
+  </Step>
+</Steps>
+
+## Not covered here
+
+These routes exist in the service but are internal to the SSO team.
+
+| Path | Reason |
+| --- | --- |
+| `POST /oauth/client/register` | Guarded by the master API key |
+| `POST /user/sync`, `/user/sync/*` | IAM migration and synchronisation pipeline |
+| `POST /user/hook-profile` | Triggers profile webhooks to registered clients |
+| `/admin/*` | Administrative operations |
+| `POST /sync-bzb` | Scheduled Buzzebee synchronisation job |
