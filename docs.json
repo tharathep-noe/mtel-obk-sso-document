@@ -14,22 +14,7 @@
     }
   },
   "navigation": {
-    "tabs": [
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "authentication",
-              "social-login-app-credentials",
-              "conventions",
-              "errors"
-            ]
-          }
-        ]
-      },
+    "groups": [
       {
         "tab": "API reference",
         "groups": [
