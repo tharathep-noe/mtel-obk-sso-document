@@ -1,0 +1,66 @@
+---
+title: "Verify OTP"
+description: "Verify the code entered by the user against the reference returned by POST /otp/send."
+api: "POST /otp/verify"
+---
+
+<Info>
+  No authentication. This endpoint has no guard applied.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+## Body
+
+<ParamField body="otp.reference" type="string" required>
+  Reference returned by POST /otp/send.
+</ParamField>
+
+<ParamField body="otp.code" type="string" required>
+  Six-digit numeric code received by the user.
+</ParamField>
+
+## Response
+
+<ResponseField name="data.otp.id" type="string">
+  Record id of the verified OTP. Confirms the identity is verified. The identity itself is what you sign into the OTP grant JWT.
+</ResponseField>
+
+## Remarks
+
+- Wrong code returns SSO_OTP_003; an expired code returns SSO_OTP_004.
+- After a successful verification, sign the OTP JWT with your clientSecret and call POST /oauth/token with grantType = otp.
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://{{SSO_BASE_URL}}/otp/verify' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "otp": {
+    "reference": "a1B2c3",
+    "code": "123456"
+  }
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "data": {
+    "otp": {
+      "id": "3f6c1d5e-6a4b-4a1e-9f6d-1c2b3a4d5e6f"
+    }
+  }
+}
+```
+
+</ResponseExample>

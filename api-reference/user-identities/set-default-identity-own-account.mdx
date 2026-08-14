@@ -1,0 +1,51 @@
+---
+title: "Set Default Identity (own account)"
+description: "Promote one of the token owner’s identities to be the default."
+api: "PUT /user/me/{identityId}/default"
+---
+
+<Info>
+  Bearer token. Send `Authorization: Bearer {access_token}`.
+</Info>
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Access token from `POST /oauth/token`, in the form `Bearer {access_token}`.
+</ParamField>
+
+## Path parameters
+
+<ParamField path="identityId" type="string" required>
+  id of the identity.
+</ParamField>
+
+## Body
+
+This endpoint takes no request body.
+
+## Response
+
+<ResponseField name="result" type="boolean">
+  Whether the operation succeeded.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request PUT \
+  --url 'https://{{SSO_BASE_URL}}/user/me/{identityId}/default' \
+  --header 'Authorization: Bearer {access_token}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "result": true
+}
+```
+
+</ResponseExample>

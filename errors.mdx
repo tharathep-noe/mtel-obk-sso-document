@@ -1,0 +1,87 @@
+---
+title: "Errors"
+description: "Error response format, status codes and the full error code table."
+---
+
+All errors are returned by a single exception filter.
+
+```json
+{
+  "error": {
+    "statusCode": "SSO_IDP_001",
+    "message": "Identity already exists.",
+    "stack": "... (non-production environments only)"
+  }
+}
+```
+
+<Warning>
+  Always branch on `error.statusCode`, never on `error.message`. Some messages are overridden at runtime and some contain typos carried over from the service.
+</Warning>
+
+`error.statusCode` holds the application error code as a string for known business errors, or the numeric HTTP status for validation and framework errors.
+
+## Status codes
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| 200 / 201 | Success. 201 is returned by `POST /user/register` only | - |
+| 204 | Success with no body. Returned by `PUT /accounts/delete/` | - |
+| 400 | Validation or business error. `error.details.errors` is present for schema failures | Fix the payload |
+| 401 | Missing or invalid credentials, or an expired access token | Refresh the token, or check the credentials for that environment |
+| 422 | Identity exists in both IAM and Buzzebee | Prompt the user to merge, or retry with `options.auto_merge = true` |
+| 429 | OTP request limit reached for the identifier | Wait for the rolling hour window |
+| 500 | Server error, or a business error mapped to 500 | Retry, then contact the SSO team |
+
+## Retry policy
+
+<Steps>
+  <Step title="Await every response">Do not fire-and-forget. Wait for each response before issuing the next request for the same user.</Step>
+  <Step title="Classify the failure">Retry only transport failures, 429 and 5xx. Never retry a 4xx validation error.</Step>
+  <Step title="Back off">For 429 wait for the rolling hour window. For 5xx use exponential back-off with jitter, maximum 3 attempts.</Step>
+  <Step title="Refresh once on 401">Refresh the access token and replay the request a single time.</Step>
+  <Step title="Log correlation data">Record the endpoint, `publicId`, timestamp and `error.statusCode`.</Step>
+</Steps>
+
+## Error codes
+
+| Error code | HTTP status | Message |
+| --- | --- | --- |
+| `OB_001` | 500 | internal server error |
+| `OB_002` | 408 | request timeout |
+| `OB_003` | 405 | method not allowed |
+| `OB_004` | 404 | API not found |
+| `OB_005` | 403 | forbidden |
+| `OB_006` | 401 | unauthorized |
+| `OB_007` | 400 | invalid parameters, %s |
+| `OB_008` | 403 | Permssion denied (typo present in the service) |
+| `OB_009` | 500 | AWS client not found |
+| `OB_0010` | 500 | Invalid request body |
+| `SSO_ACC_001` | 400 | An account-id is not found. |
+| `SSO_ACC_002` | 400 | An public-id is not found. |
+| `SSO_OTP_001` | 429 | OTP reach requested limited. |
+| `SSO_OTP_002` | 500 | Generating otp failed |
+| `SSO_OTP_003` | 500 | Invalid OTP |
+| `SSO_OTP_004` | 500 | OTP Expired |
+| `SSO_OTP_005` | 403 | Invalid Whitelist Country OTP |
+| `SSO_OTP_006` | 403 | Invalid indentifier (typo present in the service) |
+| `SSO_IDP_001` | 400 | Identity already exists. |
+| `SSO_IDP_002` | 400 | Adding a new email or phone number would exceed the allowed limit. |
+| `SSO_IDP_003` | 400 | Failed to delete identity |
+| `SSO_IDP_004` | 400 | Failed to unlink external identity |
+| `SSO_IDP_005` | 400 | Can not link external identity |
+| `SSO_IDP_006` | 400 | Identity does not exist |
+| `SSO_IDP_007` | 500 | Cannot delete default identity. |
+| `SSO_IDP_008` | 400 | External identity does not exist |
+| `SSO_IDP_009` | 400 | Account does not have a password set, please try logging in with an external provider. |
+| `SSO_IDP_0010` | 400 | Duplicate external identity |
+| `AUTH_SSO_001` | 401 | Identifier does not found for this provider |
+| `AUTH_SSO_002` | 422 | Found identfier on both iam and bzb account, please merge |
+| `AUTH_SSO_EXT_001` | 400 | Failed to get user profile from provider, please check the input token |
+| `AUTH_SSO_EXT_002` | 400 | Failed to validate the token from this provider |
+| `SSO_IAM_001` | 400 | Failed to register iam account |
+| `SSO_CPW_001` | 400 | Identity not found |
+| `IAM_VLD_001` | 400 | account not found |
+| `SSO_BZB_001` | 400 | Client bzb is unauthorized for this feature |
+| `SSO_BZB_002` | 400 | Failed to register bzb account |
+

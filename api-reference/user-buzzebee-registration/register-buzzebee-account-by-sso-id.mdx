@@ -1,0 +1,74 @@
+---
+title: "Register Buzzebee Account by SSO ID"
+description: "Server-to-server equivalent of POST /user/bzb/register. No request body."
+api: "POST /user/{ssoId}/bzb/register"
+---
+
+<Info>
+  Client credentials. Send `clientId` and `clientSecret` as headers.
+</Info>
+
+## Headers
+
+<ParamField header="clientId" type="string" required>
+  Client ID issued by the SSO team.
+</ParamField>
+
+<ParamField header="clientSecret" type="string" required>
+  Client secret issued by the SSO team.
+</ParamField>
+
+## Path parameters
+
+<ParamField path="ssoId" type="string" required>
+  publicId of the account. sso_xxxx.
+</ParamField>
+
+## Body
+
+This endpoint takes no request body.
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether Buzzebee accepted the registration.
+</ResponseField>
+
+<ResponseField name="code" type="string">
+  Status code returned by Buzzebee. Optional. Passed through unchanged.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Message returned by Buzzebee. Optional. Passed through unchanged.
+</ResponseField>
+
+<ResponseField name="data.UserId" type="string">
+  Buzzebee user id of the newly created account. Store it if you need to cross-reference Buzzebee.
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  Email address used for the Buzzebee registration. Optional.
+</ResponseField>
+
+<ResponseField name="phone_number" type="string">
+  Phone number used for the Buzzebee registration. Optional.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://{{SSO_BASE_URL}}/user/{ssoId}/bzb/register' \
+  --header 'clientId: {client_id}' \
+  --header 'clientSecret: {client_secret}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```text 200
+(Buzzebee registration result)
+```
+
+</ResponseExample>

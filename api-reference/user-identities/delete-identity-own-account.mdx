@@ -1,0 +1,60 @@
+---
+title: "Delete Identity (own account)"
+description: "Remove an email or phone identity from the token owner."
+api: "DELETE /user/me/identity/{identityId}"
+---
+
+<Info>
+  Bearer token. Send `Authorization: Bearer {access_token}`.
+</Info>
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Access token from `POST /oauth/token`, in the form `Bearer {access_token}`.
+</ParamField>
+
+## Path parameters
+
+<ParamField path="identityId" type="string" required>
+  id of the identity (from the profile response).
+</ParamField>
+
+## Body
+
+This endpoint takes no request body.
+
+## Response
+
+<ResponseField name="result" type="boolean">
+  Whether the operation succeeded.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable confirmation. For display or logging only. Do not branch on this text.
+</ResponseField>
+
+## Remarks
+
+- The default identity cannot be deleted — returns SSO_IDP_007.
+
+<RequestExample>
+
+```bash cURL
+curl --request DELETE \
+  --url 'https://{{SSO_BASE_URL}}/user/me/identity/{identityId}' \
+  --header 'Authorization: Bearer {access_token}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "result": true,
+  "message": "Identity id: 9c1e... deleted successfully"
+}
+```
+
+</ResponseExample>

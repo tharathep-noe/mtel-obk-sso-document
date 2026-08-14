@@ -1,0 +1,76 @@
+---
+title: "Send OTP"
+description: "Generate an OTP for an email address or phone number and dispatch it asynchronously through the notification service."
+api: "POST /otp/send"
+---
+
+<Info>
+  No authentication. This endpoint has no guard applied.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+## Body
+
+<ParamField body="identity.provider" type="string" required>
+  Channel of the identity. email | phone.
+</ParamField>
+
+<ParamField body="identity.identifier" type="string" required>
+  Email address, or phone number without country code.
+</ParamField>
+
+<ParamField body="identity.country_code" type="string">
+  Country calling code, prefixed to the phone number. Required when provider = phone. Conditional field.
+</ParamField>
+
+## Response
+
+<ResponseField name="data.otp.reference" type="string">
+  Reference of the generated OTP. Six alphanumeric characters. Send it back to /otp/verify together with the code the user received.
+</ResponseField>
+
+## Remarks
+
+- The code expires 5 minutes after it is issued.
+- Issuing a new OTP immediately invalidates any previous unexpired OTP for the same identifier.
+- Rate limited per identifier per rolling hour (MAX_REQUEST_OTP, default 5). Exceeding the limit returns SSO_OTP_001 with HTTP 429.
+- Delivery is asynchronous: SSO emits an event and the notification service sends the SMS/email. Confirm the channel and message template are configured before testing.
+
+<Warning>
+  **Known issue.** For provider = "phone" the controller passes identifier into the email argument of OtpService.getIdentifier(), leaving the phone argument undefined, so the request currently falls through to SSO_OTP_006 (Invalid indentifier). Verify with the SSO team before designing a phone OTP flow.
+</Warning>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://{{SSO_BASE_URL}}/otp/send' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "identity": {
+    "provider": "email",
+    "identifier": "user@example.com"
+  }
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "data": {
+    "otp": {
+      "reference": "a1B2c3"
+    }
+  }
+}
+```
+
+</ResponseExample>

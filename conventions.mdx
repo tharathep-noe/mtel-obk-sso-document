@@ -1,0 +1,48 @@
+---
+title: "Conventions"
+description: "Data types, enumerations and response envelopes."
+---
+
+## Response envelope
+
+The envelope is not uniform across the service. Check each endpoint.
+
+| Shape | Endpoints |
+| --- | --- |
+| `{ "data": { ... } }` | `/oauth/token`, `/oauth/reset-token`, `/otp/send`, `/otp/verify`, `/user/register`, `/accounts/{accountId}` |
+| Object returned directly | All other endpoints, including profile and identity responses |
+
+## Data types
+
+| Data type | Remarks |
+| --- | --- |
+| Date, Datetime | ISO-8601. Datetime values are returned in UTC. Date-only input such as `birthDate` uses `YYYY-MM-DD` |
+| String | UTF-8. Password fields require a minimum of 8 characters. Email identifiers are lower-cased server-side |
+| Boolean | JSON `true` / `false`, not the strings `"true"` / `"false"` |
+| Enum | Case-sensitive. A value outside the enum fails validation with HTTP 400 |
+| Array | `emails` and `phoneNumbers` accept a maximum of 3 items each. Send `[]` rather than `null` |
+| Object (`meta`) | Free-form JSON stored as-is and returned unchanged |
+
+## Enumerations
+
+| Enum | Accepted values |
+| --- | --- |
+| IdentityProvider | `email`, `phone`, `sso`, `keycloak` |
+| ExternalIdentityProvider | `facebook`, `google`, `line`, `apple`, `email`, `phone`, `iam`, `bzb` |
+| ProfileGender | `male`, `female`, `nonbinary`, `prefernottosay` |
+| AddressType | `home`, `office`, `other` |
+| AccountStatus | `active`, `inactive`, `blocked`, `suspended` |
+| RegistrationType | `thai`, `non_thai`, `traveler` (legacy `traveller` is accepted and normalised) |
+| GrantType | `password`, `otp`, `social`, `refresh_token` |
+
+## Request sequence
+
+<Steps>
+  <Step title="Store your credentials">Obtain `clientId` and `clientSecret` from the SSO team and keep them in a secret manager.</Step>
+  <Step title="Get a token">Call `POST /oauth/token` with the agreed grant type.</Step>
+  <Step title="Act on behalf of the user">Call `/user/me/...` with `Authorization: Bearer {access_token}`.</Step>
+  <Step title="Act from your backend">Call `/user/{ssoId}/...` with `clientId` and `clientSecret` instead.</Step>
+  <Step title="Handle 401">Refresh with `grantType = refresh_token` and retry the original request once.</Step>
+  <Step title="Store the publicId">It is the cross-system key for the account. There is no lookup from email to `ssoId`.</Step>
+</Steps>
+

@@ -1,0 +1,82 @@
+---
+title: "Link External Identity (own account)"
+description: "Link a social identity to the token owner."
+api: "POST /user/me/external-identity"
+---
+
+<Info>
+  Bearer token. Send `Authorization: Bearer {access_token}`.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Access token from `POST /oauth/token`, in the form `Bearer {access_token}`.
+</ParamField>
+
+## Body
+
+<ParamField body="value" type="string" required>
+  User id (uid) at the provider.
+</ParamField>
+
+<ParamField body="provider" type="string" required>
+  Social provider. facebook | google | line | apple | email | phone | iam | bzb.
+</ParamField>
+
+## Response
+
+<ResponseField name="external[]" type="object[]">
+  All social identities linked to the account after the operation.
+</ResponseField>
+
+<ResponseField name="external[].id" type="string">
+  External identity record id. Use for DELETE /user/me/external-identity/`{id}`.
+</ResponseField>
+
+<ResponseField name="external[].value" type="string">
+  User id (uid) at the provider.
+</ResponseField>
+
+<ResponseField name="external[].provider" type="string">
+  Social provider. facebook | google | line | apple | email | phone | iam | bzb.
+</ResponseField>
+
+## Remarks
+
+- A uid already linked elsewhere returns SSO_IDP_0010; other failures return SSO_IDP_005.
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://{{SSO_BASE_URL}}/user/me/external-identity' \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer {access_token}' \
+  --data '{
+  "value": "fb-uid-123",
+  "provider": "facebook"
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "external": [
+    {
+      "id": "4a8f...",
+      "value": "fb-uid-123",
+      "provider": "facebook"
+    }
+  ]
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,229 @@
+---
+title: "Get User Profile by SSO ID"
+description: "Read the full profile of an account by its publicId."
+api: "GET /user/profile/{ssoId}"
+---
+
+<Info>
+  Client credentials. Send `clientId` and `clientSecret` as headers.
+</Info>
+
+## Headers
+
+<ParamField header="clientId" type="string" required>
+  Client ID issued by the SSO team.
+</ParamField>
+
+<ParamField header="clientSecret" type="string" required>
+  Client secret issued by the SSO team.
+</ParamField>
+
+## Path parameters
+
+<ParamField path="ssoId" type="string" required>
+  publicId of the account. sso_xxxx.
+</ParamField>
+
+## Body
+
+This endpoint takes no request body.
+
+## Response
+
+<ResponseField name="firstName" type="string">
+  Given name.
+</ResponseField>
+
+<ResponseField name="middleName" type="string">
+  Middle name. Nullable.
+</ResponseField>
+
+<ResponseField name="lastName" type="string">
+  Family name.
+</ResponseField>
+
+<ResponseField name="birthDate" type="string">
+  Date of birth. Nullable. ISO-8601 UTC.
+</ResponseField>
+
+<ResponseField name="profilePhoto" type="string">
+  Profile image URL. Nullable.
+</ResponseField>
+
+<ResponseField name="gender" type="string">
+  Gender. Nullable. male | female | nonbinary | prefernottosay.
+</ResponseField>
+
+<ResponseField name="idCard" type="string">
+  Thai national ID number. Nullable. PII.
+</ResponseField>
+
+<ResponseField name="passport" type="string">
+  Passport number. Nullable. PII.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Account status. active | inactive | blocked | suspended.
+</ResponseField>
+
+<ResponseField name="publicId" type="string">
+  SSO ID of the account. Format sso_xxxx.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Account creation time. ISO-8601 UTC.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+  Last profile update time. ISO-8601 UTC.
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Free-form metadata stored with the profile. Returned unchanged.
+</ResponseField>
+
+<ResponseField name="addresses[]" type="object[]">
+  Postal addresses. Empty array when none.
+</ResponseField>
+
+<ResponseField name="addresses[].id" type="string">
+  Address record id. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].address" type="string">
+  Street address. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].zipCode" type="string">
+  Postal code. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].province" type="string">
+  Province. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].district" type="string">
+  District. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].subDistrict" type="string">
+  Sub-district. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].country" type="string">
+  Country. Nullable.
+</ResponseField>
+
+<ResponseField name="addresses[].type" type="string">
+  Address type. Nullable. home | office | other.
+</ResponseField>
+
+<ResponseField name="emails[]" type="object[]">
+  Email identities. Maximum 3 items.
+</ResponseField>
+
+<ResponseField name="emails[].id" type="string">
+  Identity record id. Use for /user/me/identity/`{identityId}` operations.
+</ResponseField>
+
+<ResponseField name="emails[].value" type="string">
+  Email address.
+</ResponseField>
+
+<ResponseField name="emails[].isDefault" type="boolean">
+  Marks the primary email.
+</ResponseField>
+
+<ResponseField name="phoneNumbers[]" type="object[]">
+  Phone identities. Maximum 3 items.
+</ResponseField>
+
+<ResponseField name="phoneNumbers[].id" type="string">
+  Identity record id.
+</ResponseField>
+
+<ResponseField name="phoneNumbers[].value" type="string">
+  Phone number including country code.
+</ResponseField>
+
+<ResponseField name="phoneNumbers[].isDefault" type="boolean">
+  Marks the primary phone number.
+</ResponseField>
+
+<ResponseField name="external[]" type="object[]">
+  Linked social identities. Empty array when none.
+</ResponseField>
+
+<ResponseField name="external[].id" type="string">
+  External identity record id.
+</ResponseField>
+
+<ResponseField name="external[].value" type="string">
+  User id (uid) at the provider.
+</ResponseField>
+
+<ResponseField name="external[].provider" type="string">
+  Social provider. facebook | google | line | apple | email | phone | iam | bzb.
+</ResponseField>
+
+<ResponseField name="external[].meta" type="object">
+  Provider metadata. Optional.
+</ResponseField>
+
+<ResponseField name="registrationType" type="string">
+  Registration category. Nullable. thai | non_thai | traveler.
+</ResponseField>
+
+<ResponseField name="hasPassword" type="boolean">
+  Whether the account can log in with grantType = password. Use it to decide between a password field and a social provider.
+</ResponseField>
+
+## Remarks
+
+- The response is NOT wrapped in a data envelope.
+- hasPassword indicates whether the account can log in with grantType = password. Use it to decide between showing a password field or steering the user to a social provider.
+- An unknown ssoId returns SSO_ACC_002.
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url 'https://{{SSO_BASE_URL}}/user/profile/{ssoId}' \
+  --header 'clientId: {client_id}' \
+  --header 'clientSecret: {client_secret}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "firstName": "Somchai",
+  "middleName": null,
+  "lastName": "Jaidee",
+  "birthDate": "1990-01-31T00:00:00.000Z",
+  "profilePhoto": null,
+  "gender": "male",
+  "idCard": null,
+  "passport": null,
+  "status": "active",
+  "publicId": "sso_01HZX9K3M4N5P6Q7R8S9T0",
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "updatedAt": "2026-01-01T00:00:00.000Z",
+  "meta": {},
+  "addresses": [
+    {
+      "id": "0f3a...", "address": null, "zipCode": null, "province": null,
+      "district": null, "subDistrict": null, "country": null, "type": "home"
+    }
+  ],
+  "emails": [ { "id": "9c1e...", "value": "user@example.com", "isDefault": true } ],
+  "phoneNumbers": [ { "id": "7b2d...", "value": "66812345678", "isDefault": true } ],
+  "external": [ { "id": "4a8f...", "value": "fb-uid-123", "provider": "facebook", "meta": {} } ],
+  "registrationType": "thai",
+  "hasPassword": true
+}
+```
+
+</ResponseExample>

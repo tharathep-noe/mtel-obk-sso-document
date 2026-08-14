@@ -1,0 +1,65 @@
+---
+title: "Suspend / Restore Account"
+description: "Soft-delete an account by setting suspended_at, or restore it by clearing the field."
+api: "PUT /accounts/delete/"
+---
+
+<Info>
+  Client credentials. Send `clientId` and `clientSecret` as headers.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+<ParamField header="clientId" type="string" required>
+  Client ID issued by the SSO team.
+</ParamField>
+
+<ParamField header="clientSecret" type="string" required>
+  Client secret issued by the SSO team.
+</ParamField>
+
+## Body
+
+<ParamField body="publicId" type="string" required>
+  publicId of the account. sso_xxxx.
+</ParamField>
+
+<ParamField body="isDelete" type="boolean" required>
+  true suspends the account, false restores it.
+</ParamField>
+
+## Response
+
+This endpoint returns no response body. Check the HTTP status code instead.
+
+## Remarks
+
+- Note the trailing slash in the path.
+
+<RequestExample>
+
+```bash cURL
+curl --request PUT \
+  --url 'https://{{SSO_BASE_URL}}/accounts/delete/' \
+  --header 'Content-Type: application/json' \
+  --header 'clientId: {client_id}' \
+  --header 'clientSecret: {client_secret}' \
+  --data '{
+  "publicId": "sso_01HZX9K3M4N5P6Q7R8S9T0",
+  "isDelete": true
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```text 200
+(empty body)
+```
+
+</ResponseExample>

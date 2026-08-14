@@ -1,0 +1,164 @@
+---
+title: "Add Identity by SSO ID"
+description: "Server-to-server equivalent of POST /user/me/identity."
+api: "POST /user/{ssoId}/identity"
+---
+
+<Info>
+  Client credentials. Send `clientId` and `clientSecret` as headers.
+</Info>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Always `application/json` when a body is sent.
+</ParamField>
+
+<ParamField header="clientId" type="string" required>
+  Client ID issued by the SSO team.
+</ParamField>
+
+<ParamField header="clientSecret" type="string" required>
+  Client secret issued by the SSO team.
+</ParamField>
+
+## Path parameters
+
+<ParamField path="ssoId" type="string" required>
+  publicId of the account. sso_xxxx.
+</ParamField>
+
+## Body
+
+See the request example.
+
+## Response
+
+<ResponseField name="id" type="string">
+  Internal account id. Not the publicId.
+</ResponseField>
+
+<ResponseField name="publicId" type="string">
+  SSO ID of the account. Format sso_xxxx.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Account creation time. ISO-8601 UTC.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+  Last update time. ISO-8601 UTC.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Account status. active | inactive | blocked | suspended.
+</ResponseField>
+
+<ResponseField name="registrationType" type="string">
+  Registration category. Nullable.
+</ResponseField>
+
+<ResponseField name="suspendedAt" type="string">
+  Time the account was suspended. Nullable. Null means active.
+</ResponseField>
+
+<ResponseField name="identites[]" type="object[]">
+  Email and phone identities. Optional. Note the spelling in the payload.
+</ResponseField>
+
+<ResponseField name="identites[].id" type="string">
+  Identity record id.
+</ResponseField>
+
+<ResponseField name="identites[].provider" type="string">
+  Identity channel. email | phone | sso | keycloak.
+</ResponseField>
+
+<ResponseField name="identites[].identifier" type="string">
+  Email address or phone number.
+</ResponseField>
+
+<ResponseField name="identites[].default" type="boolean">
+  Marks the default identity. The default identity cannot be deleted.
+</ResponseField>
+
+<ResponseField name="identites[].meta" type="object">
+  Identity metadata. Nullable.
+</ResponseField>
+
+<ResponseField name="identites[].createdAt" type="string">
+  Creation time.
+</ResponseField>
+
+<ResponseField name="identites[].updatedAt" type="string">
+  Last update time.
+</ResponseField>
+
+<ResponseField name="identites[].accountId" type="string">
+  Owning account id. Optional.
+</ResponseField>
+
+<ResponseField name="externalIdentities[]" type="object[]">
+  Linked social identities. Optional.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].id" type="string">
+  External identity record id.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].uid" type="string">
+  User id at the provider.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].provider" type="string">
+  Social provider. facebook | google | line | apple | email | phone | iam | bzb.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].meta" type="object">
+  Provider metadata. Nullable.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].createdAt" type="string">
+  Creation time.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].updatedAt" type="string">
+  Last update time.
+</ResponseField>
+
+<ResponseField name="externalIdentities[].accountId" type="string">
+  Owning account id. Optional.
+</ResponseField>
+
+<ResponseField name="migrationCampaignRedeem.campaignCode" type="string">
+  Campaign code applied while merging a Buzzebee account. Optional. Populated for mode = merge.
+</ResponseField>
+
+<ResponseField name="migrationCampaignRedeem.isRedeemed" type="boolean">
+  Whether the migration campaign was redeemed. Optional.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://{{SSO_BASE_URL}}/user/{ssoId}/identity' \
+  --header 'Content-Type: application/json' \
+  --header 'clientId: {client_id}' \
+  --header 'clientSecret: {client_secret}' \
+  --data '{
+  "identifier": "user2@example.com",
+  "provider": "email",
+  "mode": "create"
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```text 200
+(same account object as POST /user/me/identity)
+```
+
+</ResponseExample>

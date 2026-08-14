@@ -1,0 +1,50 @@
+---
+title: "Authentication"
+description: "The three authentication mechanisms used by the SSO API."
+---
+
+Each endpoint states which mechanism it requires. No endpoint requires more than one.
+
+<CardGroup cols={2}>
+  <Card title="Client credentials" icon="key">
+    Headers `clientId` and `clientSecret`. Used for token issuance, registration and all server-to-server user operations.
+  </Card>
+  <Card title="Bearer access token" icon="user">
+    Header `Authorization: Bearer {access_token}`. Used by endpoints under `/user/me/...` that act on the signed-in user.
+  </Card>
+</CardGroup>
+
+<Warning>
+  Client credentials are sent as **custom headers, not HTTP Basic Auth**. Header names are case-insensitive.
+</Warning>
+
+The master API key (`Authorization: ApiKey {api_key}`) is held by the SSO team and used only for OAuth client registration. It is never issued to consuming teams.
+
+## Choosing between /user/me and /user/`{ssoId}`
+
+Most user operations exist as a pair.
+
+| Path shape | Auth | Use when |
+| --- | --- | --- |
+| `/user/me/...` | Bearer | The call originates from a signed-in user session |
+| `/user/{ssoId}/...` | Client credentials | Your backend acts on a specified account |
+
+<Note>
+  `POST /user/me/validate` is the exception. Despite the `me` in the path it is guarded by client credentials, not a Bearer token.
+</Note>
+
+## Resource identifiers
+
+| Path | Meaning of the parameter |
+| --- | --- |
+| `/user/profile/{ssoId}`, `/user/{ssoId}/...` | `publicId` of the account, format `sso_xxxx` |
+| `/user/me/identity/{identityId}`, `/user/me/{identityId}/default` | id of an email or phone identity |
+| `/user/me/external-identity/{externalIdentityId}` | id of a linked social identity |
+| `/accounts/{accountId}` | Internal account UUID, **not** the `publicId` |
+
+## Token lifetime
+
+<Warning>
+  `expiresIn` is currently returned as the literal value `3600` and does not follow the configured token TTL. Refresh on HTTP 401 rather than relying on a local countdown.
+</Warning>
+
