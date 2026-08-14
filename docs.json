@@ -14,7 +14,22 @@
     }
   },
   "navigation": {
-    "groups": [
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "index",
+              "authentication",
+              "conventions",
+              "errors",
+              "social-login-app-credentials"
+            ]
+          }
+        ]
+      },
       {
         "tab": "API reference",
         "groups": [
